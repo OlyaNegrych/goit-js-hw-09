@@ -8,7 +8,6 @@ startBtn.addEventListener('click', onStartColorChangeFn);
 stopBtn.addEventListener('click', onStopColorChangeFn);
 stopBtn.setAttribute('disabled', 'disabled');
 
-
 function onStartColorChangeFn() {
     intervalID = setInterval(() => {
     bodyRef.style.backgroundColor = `${getRandomHexColor()}`;   
