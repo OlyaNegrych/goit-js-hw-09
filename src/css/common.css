@@ -22,10 +22,9 @@ img {
 }
 
 .field {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -35,7 +34,6 @@ img {
 
 .value {
   display: block;
-  flex-grow: 1;
   font-size: 30px;
   font-weight: 500;
 }
