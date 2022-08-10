@@ -1,10 +1,13 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
+const startBtn = document.querySelector('[data-start]');
+const stopBtn = document.querySelector('[data-stop]');
 const timerRef = document.querySelector('.timer');
-const fieldRef = document.querySelector('.field');
-const valueRef = document.querySelector('.value');
-const labelRef = document.querySelector('.label');
+const daysRef = document.querySelector('[data-days]');
+const hoursRef = document.querySelector('[data-hours]');
+const minutesRef = document.querySelector('[data-minutes]');
+const secondsRef = document.querySelector('[data-seconds]');
 
 const options = {
   enableTime: true,
@@ -16,24 +19,47 @@ const options = {
   },
 };
 
+// console.log(options.defaultDate.getTime()); // current time
+// console.log(options.onClose(selectedDates[0]));  // chosen time
+
 flatpickr('#datetime-picker', { options });
 
+startBtn.addEventListener('click', () => { timer.start(); });
+stopBtn.addEventListener('click', () => { timer.stop(); });
+stopBtn.setAttribute('disabled', 'disabled');
+
 const timer = {
+    intervalId: null,
     start() {
         const startTime = Date.now();
 
-        setInterval(() => {
+       this.intervalId = setInterval(() => {
             const currentTime = Date.now();
-            const deltaTime = currentTime - startTime;
-            const timeComponents = convertMs(deltaTime);
+            const deltaTime = startTime + currentTime;
+            const { days, hours, minutes, seconds } = convertMs(deltaTime);
 
-            console.log(timeComponents);
-            
-        }, 1000);
+           console.log(`${days} : ${hours} : ${minutes} : ${seconds}`);
+           
+           updateClockFace({ days, hours, minutes, seconds });
+
+       }, 1000);
+        
+        startBtn.setAttribute('disabled', 'disabled');
+        stopBtn.removeAttribute('disabled');
     },
+    stop() {
+        clearInterval(this.intervalId);
+        stopBtn.setAttribute('disabled', 'disabled');
+        startBtn.removeAttribute('disabled');
+    }
 }
 
-timer.start();
+function updateClockFace({ days, hours, minutes, seconds }) {
+    daysRef.textContent = `${days}`;
+    hoursRef.textContent = `${hours}`;
+    minutesRef.textContent = `${minutes}`;
+    secondsRef.textContent = `${seconds}`;
+}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
