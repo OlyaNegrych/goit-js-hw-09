@@ -1,9 +1,9 @@
 import flatpickr from 'flatpickr';
+import Notiflix from 'notiflix';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const startBtn = document.querySelector('[data-start]');
-const stopBtn = document.querySelector('[data-stop]');
-const timerRef = document.querySelector('.timer');
+const resetBtn = document.querySelector('[data-reset]');
 const daysRef = document.querySelector('[data-days]');
 const hoursRef = document.querySelector('[data-hours]');
 const minutesRef = document.querySelector('[data-minutes]');
@@ -15,50 +15,60 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    console.log(selectedDates[0]);
+    timer.targetTime = selectedDates[0].getTime();
+    if ((timer.targetTime - Date.now()) <= 0) {
+      Notiflix.Notify.warning('Please choose a date in the future');
+    } else {
+      startBtn.removeAttribute('disabled');
+    }
   },
 };
 
-// console.log(options.defaultDate.getTime()); // current time
-// console.log(options.onClose(selectedDates[0]));  // chosen time
+flatpickr('#datetime-picker', options);
 
-flatpickr('#datetime-picker', { options });
-
-startBtn.addEventListener('click', () => { timer.start(); });
-stopBtn.addEventListener('click', () => { timer.stop(); });
-stopBtn.setAttribute('disabled', 'disabled');
+startBtn.addEventListener('click', () => {
+  timer.start();
+});
+resetBtn.addEventListener('click', () => {
+  timer.reset();
+});
+resetBtn.setAttribute('disabled', 'disabled');
+startBtn.setAttribute('disabled', 'disabled');
 
 const timer = {
-    intervalId: null,
-    start() {
-        const startTime = Date.now();
+  intervalId: null,
+  targetTime: null,
+  start() {
+    this.intervalId = setInterval(() => {
+      if (this.targetTime - Date.now() <= 0) {
+        this.reset();
+      }
+      const currentTime = Date.now();
+      const deltaTime = this.targetTime - currentTime;
+      const time = convertMs(deltaTime);
+      
+      updateClockFace(time);
+    }, 1000);
 
-       this.intervalId = setInterval(() => {
-            const currentTime = Date.now();
-            const deltaTime = startTime + currentTime;
-            const { days, hours, minutes, seconds } = convertMs(deltaTime);
+    startBtn.setAttribute('disabled', 'disabled');
+    resetBtn.removeAttribute('disabled');
+  },
+  reset() {
+    clearInterval(this.intervalId);
+    const time = convertMs(0);
+    updateClockFace(time);
+    timer.targetTime = Date.now();
 
-           console.log(`${days} : ${hours} : ${minutes} : ${seconds}`);
-           
-           updateClockFace({ days, hours, minutes, seconds });
-
-       }, 1000);
-        
-        startBtn.setAttribute('disabled', 'disabled');
-        stopBtn.removeAttribute('disabled');
-    },
-    stop() {
-        clearInterval(this.intervalId);
-        stopBtn.setAttribute('disabled', 'disabled');
-        startBtn.removeAttribute('disabled');
-    }
-}
+    resetBtn.setAttribute('disabled', 'disabled');
+    startBtn.removeAttribute('disabled');
+  },
+};
 
 function updateClockFace({ days, hours, minutes, seconds }) {
-    daysRef.textContent = `${days}`;
-    hoursRef.textContent = `${hours}`;
-    minutesRef.textContent = `${minutes}`;
-    secondsRef.textContent = `${seconds}`;
+  daysRef.textContent = `${days}`;
+  hoursRef.textContent = `${hours}`;
+  minutesRef.textContent = `${minutes}`;
+  secondsRef.textContent = `${seconds}`;
 }
 
 function convertMs(ms) {
@@ -75,13 +85,13 @@ function convertMs(ms) {
   // Remaining minutes
   const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
   // Remaining seconds
-  const seconds = addLeadingZero(Math.floor(
-    (((ms % day) % hour) % minute) / second
-  ));
+  const seconds = addLeadingZero(
+    Math.floor((((ms % day) % hour) % minute) / second)
+  );
 
   return { days, hours, minutes, seconds };
 }
 
 function addLeadingZero(value) {
-    return String().padStart(2, '0');
+  return String(value).padStart(2, '0');
 }
