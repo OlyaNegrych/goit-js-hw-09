@@ -44,3 +44,28 @@ img {
   font-size: 12px;
   font-weight: 500;
 }
+
+.form {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+label {
+  display: inline-flex;
+  flex-direction: column;
+  margin-right: 5px;
+}
+
+input {
+  max-width: 150px;
+}
+
+.btn {
+ height: 22px;
+}
