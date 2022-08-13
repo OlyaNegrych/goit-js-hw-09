@@ -12,7 +12,7 @@ formRef.addEventListener('submit', onPromiseCreate);
 function onPromiseCreate(evt) {
   evt.preventDefault();
   const { delay, step, amount } = evt.currentTarget;
-
+  
   let promiseDelay = Number(delay.value);
 
   for (let i = 1; i <= amount.value; i += 1) {
