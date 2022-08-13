@@ -4,20 +4,16 @@ const formRef = document.querySelector('.form');
 const delayRef = document.querySelector('[name="delay"]');
 const stepRef = document.querySelector('[name="step"]');
 const amountRef = document.querySelector('[name="amount"]');
-let intervalId = null;
-let position = 1;
 
 formRef.addEventListener('submit', onPromiseCreate);
 
 function onPromiseCreate(evt) {
   evt.preventDefault();
-  const { delay, step, amount } = evt.currentTarget;
-  
-  let promiseDelay = Number(delay.value);
+  let promiseDelay = Number(delayRef.value);
 
-  for (let i = 1; i <= amount.value; i += 1) {
+  for (let i = 1; i <= amountRef.value; i += 1) {
     createPromise(i, promiseDelay).then(onSuccess).catch(onError);
-    promiseDelay += Number(step.value);
+    promiseDelay += Number(stepRef.value);
   }
 }
 
